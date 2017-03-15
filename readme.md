@@ -1,9 +1,11 @@
-# :package_name
+# Bulma Scaffolding for Laravel
 
 [![Software License][ico-license]](LICENSE)
+[![Build Status](https://travis-ci.org/rustymulvaney/bulma.svg?branch=master)](https://travis-ci.org/rustymulvaney/bulma)
 
-This is where your description should go. Try and limit it to a paragraph or two, and maybe throw in a mention of what
-PSRs you support to avoid any confusion with users and contributors.
+Generates scaffolding based on [Bulma](http://bulma.io/).  You also have the option to generate Auth scaffolding during the install.
+
+The Auth scaffolding uses [Vue](http://vuejs.org/).
 
 ## Install
 
@@ -19,21 +21,9 @@ $ composer require rustymulvaney/bulma
 $ php artisan bulma:install
 ```
 
-## Testing
-
-``` bash
-$ composer test
-```
-
-## Contributing
-
 ## Security
 
-If you discover any security related issues, please email rusty@dslabs.biz instead of using the issue tracker.
-
-## Credits
-
-- [Rusty Mulvaney][link-author]
+If you discover any security related issues, please submit an issue.
 
 ## License
 

@@ -1,0 +1,5 @@
+suites:
+    main:
+        namespace: rustymulvaney\bulma
+        psr4_prefix: rustymulvaney\bulma
+        src_path: src

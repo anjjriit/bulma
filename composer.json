@@ -1,0 +1,27 @@
+{
+    "name": "rusty/bulma",
+    "description": "A Laravel package for scaffolding out a site based on Bulma.",
+    "keywords": [
+        "rustymulvaney",
+        "bulma"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Rusty Mulvaney",
+            "email": "rusty@dslabs.biz"
+        }
+    ],
+    "require": {
+        "illuminate/support": "~5.1",
+        "php" : "~5.6|~7.0"
+    },
+    "require-dev": {
+        "phpspec/phpspec": "~2.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "rustymulvaney\\bulma\\": "src"
+        }
+    }
+}

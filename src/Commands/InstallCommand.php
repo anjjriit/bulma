@@ -5,10 +5,10 @@ namespace rustymulvaney\bulma\Commands;
 use App\User;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
-use Symfony\Component\Process\Process;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\ConsoleOutput;
-use Symfony\Component\Console\Formatter\OutputFormatter;
+use Symfony\Component\Process\Process;
 
 class InstallCommand extends Command
 {
@@ -29,7 +29,8 @@ class InstallCommand extends Command
     /**
      * Create a new command instance.
      *
-     * @param  Filesystem  $filesystem
+     * @param Filesystem $filesystem
+     *
      * @return void
      */
     public function __construct(Filesystem $filesystem)
@@ -45,8 +46,7 @@ class InstallCommand extends Command
         $progressCount = 0;
 
         // Questions
-        if ($this->confirm('Would you like to install auth scaffolding?'))
-        {
+        if ($this->confirm('Would you like to install auth scaffolding?')) {
             $authScaffold = true;
             $progressCount++;
 
@@ -54,9 +54,9 @@ class InstallCommand extends Command
             $name = $this->ask('Enter a name for the admin user.');
             $email = $this->ask('Enter the admin user\'s email address');
             $password = $this->ask('Enter the admin user\'s password');
-        }
-        else
+        } else {
             $authScaffold = false;
+        }
 
         // Setup the output
         $output = new ConsoleOutput();
@@ -71,21 +71,18 @@ class InstallCommand extends Command
         $progress->setMessage('Installing dependencies');
         $progress->start();
 
-        if ($this->filesystem->exists('node_modules/bulma/') === false)
-        {
+        if ($this->filesystem->exists('node_modules/bulma/') === false) {
             $processBulma = new Process('npm install bulma --save-dev');
             $processBulma->setWorkingDirectory(base_path())->run();
         }
 
-        if ($this->filesystem->exists('node_modules/font-awesome/') === false)
-        {
+        if ($this->filesystem->exists('node_modules/font-awesome/') === false) {
             $processFontAwesome = new Process('npm install font-awesome --save-dev');
             $processFontAwesome->setWorkingDirectory(base_path())->run();
         }
 
         // Auth Scaffolding
-        if ($authScaffold === true)
-        {
+        if ($authScaffold === true) {
             // Install Passport
             $process = new Process('composer require laravel/passport');
             $process->setWorkingDirectory(base_path())->run();
@@ -97,7 +94,6 @@ class InstallCommand extends Command
             $insert = 'Laravel\Passport\PassportServiceProvider::class,';
             $replace = $search."\n \t \t".$insert;
             file_put_contents($file, str_replace($search, $replace, file_get_contents($file)));
-
 
             $process = new Process('/usr/local/bin/composer dump-autoload');
             $process->setWorkingDirectory(base_path())->run();

@@ -23,8 +23,8 @@ class BulmaServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__.'/Routes/routes.php');
 
         $this->publishes([
-            __DIR__.'/../stubs/js' => resource_path('assets/js'),
-            __DIR__.'/../stubs/sass' => resource_path('assets/sass'),
+            __DIR__.'/../stubs/js'    => resource_path('assets/js'),
+            __DIR__.'/../stubs/sass'  => resource_path('assets/sass'),
             __DIR__.'/../stubs/views' => resource_path('views'),
         ], 'install');
 

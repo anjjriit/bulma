@@ -24,7 +24,7 @@ class InstallCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Install Bulma';
+    protected $description = 'Install Bulma Scaffolding';
 
     /**
      * Create a new command instance.

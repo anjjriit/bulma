@@ -14,6 +14,8 @@ require('./components');
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
+/** global: Vue */
+
 Vue.component('example', require('./components/Example.vue'));
 
 const app = new Vue({

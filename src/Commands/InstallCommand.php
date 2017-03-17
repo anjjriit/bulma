@@ -30,8 +30,6 @@ class InstallCommand extends Command
      * Create a new command instance.
      *
      * @param Filesystem $filesystem
-     *
-     * @return void
      */
     public function __construct(Filesystem $filesystem)
     {
@@ -162,11 +160,14 @@ class InstallCommand extends Command
             $progress->advance();
             $this->callSilent('make:auth');
 
-            $user = new User();
-            $user->name = $name;
-            $user->email = $email;
-            $user->password = bcrypt($password);
-            $user->save();
+            // Create admin user
+            if (isset($name, $email, $password)) {
+                $user = new User();
+                $user->name = $name;
+                $user->email = $email;
+                $user->password = bcrypt($password);
+                $user->save();
+            }
         }
 
         // Publish assets

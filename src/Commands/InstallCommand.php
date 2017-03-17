@@ -193,6 +193,7 @@ class InstallCommand extends Command
         }
         $process->setWorkingDirectory(base_path())->start();
         $process->wait();
+
         return $process->getExitCode();
     }
 }

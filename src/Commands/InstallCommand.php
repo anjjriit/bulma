@@ -88,7 +88,6 @@ class InstallCommand extends Command
 
         // Auth Scaffolding
         if ($authScaffold === true) {
-
             if ($this->filesystem->exists('vendor/laravel/passport') === false) {
 
                 // Install Passport

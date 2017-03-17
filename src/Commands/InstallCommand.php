@@ -83,68 +83,72 @@ class InstallCommand extends Command
 
         // Auth Scaffolding
         if ($authScaffold === true) {
-            // Install Passport
-            $process = new Process('composer require laravel/passport');
-            $process->setWorkingDirectory(base_path())->run();
-            $process->wait();
 
-            // Add the service provider for passport
-            $file = config_path().'/app.php';
-            $search = 'Laravel\Tinker\TinkerServiceProvider::class,';
-            $insert = 'Laravel\Passport\PassportServiceProvider::class,';
-            $replace = $search."\n \t \t".$insert;
-            file_put_contents($file, str_replace($search, $replace, file_get_contents($file)));
+            if ($this->filesystem->exists('vendor/laravel/passport') === false) {
 
-            $process = new Process('/usr/local/bin/composer dump-autoload');
-            $process->setWorkingDirectory(base_path())->run();
-            $process->wait();
-            $this->callSilent('clear-compiled');
+                // Install Passport
+                $process = new Process('composer require laravel/passport');
+                $process->setWorkingDirectory(base_path())->run();
+                $process->wait();
 
-            // Run the passport migrations and install passport
-            $process = new Process('php artisan migrate');
-            $process->setWorkingDirectory(base_path())->run();
-            $process->wait();
+                // Add the service provider for passport
+                $file = config_path().'/app.php';
+                $search = 'Laravel\Tinker\TinkerServiceProvider::class,';
+                $insert = 'Laravel\Passport\PassportServiceProvider::class,';
+                $replace = $search."\n \t \t".$insert;
+                file_put_contents($file, str_replace($search, $replace, file_get_contents($file)));
 
-            $process = new Process('php artisan passport:install');
-            $process->setWorkingDirectory(base_path())->run();
-            $process->wait();
+                $process = new Process('/usr/local/bin/composer dump-autoload');
+                $process->setWorkingDirectory(base_path())->run();
+                $process->wait();
+                $this->callSilent('clear-compiled');
 
-            // Add HasApiTokens to the user model
-            $file = app_path().'/User.php';
-            $search = 'use Illuminate\Notifications\Notifiable;';
-            $insert = 'use Laravel\Passport\HasApiTokens;';
-            $replace = $insert."\n".$search;
-            file_put_contents($file, str_replace($search, $replace, file_get_contents($file)));
+                // Run the passport migrations and install passport
+                $process = new Process('php artisan migrate');
+                $process->setWorkingDirectory(base_path())->run();
+                $process->wait();
 
-            $search = 'use Notifiable;';
-            $replace = 'use HasApiTokens, Notifiable;';
-            file_put_contents($file, str_replace($search, $replace, file_get_contents($file)));
+                $process = new Process('php artisan passport:install');
+                $process->setWorkingDirectory(base_path())->run();
+                $process->wait();
 
-            // Add Passport to AuthServiceProvider
-            $file = app_path().'/Providers/AuthServiceProvider.php';
-            $search = '$this->registerPolicies();';
-            $insert = 'Passport::routes();';
-            $replace = $search."\n \t \t".$insert;
-            file_put_contents($file, str_replace($search, $replace, file_get_contents($file)));
+                // Add HasApiTokens to the user model
+                $file = app_path().'/User.php';
+                $search = 'use Illuminate\Notifications\Notifiable;';
+                $insert = 'use Laravel\Passport\HasApiTokens;';
+                $replace = $insert."\n".$search;
+                file_put_contents($file, str_replace($search, $replace, file_get_contents($file)));
 
-            $file = app_path().'/Providers/AuthServiceProvider.php';
-            $search = 'use Illuminate\Support\Facades\Gate;';
-            $insert = 'use Laravel\Passport\Passport;';
-            $replace = $search."\n".$insert;
-            file_put_contents($file, str_replace($search, $replace, file_get_contents($file)));
+                $search = 'use Notifiable;';
+                $replace = 'use HasApiTokens, Notifiable;';
+                file_put_contents($file, str_replace($search, $replace, file_get_contents($file)));
 
-            // Change api provider to passport in auth config file
-            $file = config_path().'/auth.php';
-            $search = '\'driver\' => \'token\',';
-            $insert = '\'driver\' => \'passport\',';
-            file_put_contents($file, str_replace($search, $insert, file_get_contents($file)));
+                // Add Passport to AuthServiceProvider
+                $file = app_path().'/Providers/AuthServiceProvider.php';
+                $search = '$this->registerPolicies();';
+                $insert = 'Passport::routes();';
+                $replace = $search."\n \t \t".$insert;
+                file_put_contents($file, str_replace($search, $replace, file_get_contents($file)));
 
-            // Add CreateFreshApiToken to HTTP Kernel
-            $file = app_path().'/Http/Kernel.php';
-            $search = '\App\Http\Middleware\VerifyCsrfToken::class,';
-            $insert = '\Laravel\Passport\Http\Middleware\CreateFreshApiToken::class,';
-            $replace = $search."\n \t \t \t".$insert;
-            file_put_contents($file, str_replace($search, $replace, file_get_contents($file)));
+                $file = app_path().'/Providers/AuthServiceProvider.php';
+                $search = 'use Illuminate\Support\Facades\Gate;';
+                $insert = 'use Laravel\Passport\Passport;';
+                $replace = $search."\n".$insert;
+                file_put_contents($file, str_replace($search, $replace, file_get_contents($file)));
+
+                // Change api provider to passport in auth config file
+                $file = config_path().'/auth.php';
+                $search = '\'driver\' => \'token\',';
+                $insert = '\'driver\' => \'passport\',';
+                file_put_contents($file, str_replace($search, $insert, file_get_contents($file)));
+
+                // Add CreateFreshApiToken to HTTP Kernel
+                $file = app_path().'/Http/Kernel.php';
+                $search = '\App\Http\Middleware\VerifyCsrfToken::class,';
+                $insert = '\Laravel\Passport\Http\Middleware\CreateFreshApiToken::class,';
+                $replace = $search."\n \t \t \t".$insert;
+                file_put_contents($file, str_replace($search, $replace, file_get_contents($file)));
+            }
 
             // Generate auth scaffolding
             $progress->setMessage('Generating auth scaffolding');

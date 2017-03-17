@@ -67,6 +67,13 @@ class InstallCommand extends Command
         $progress->setFormat('Progress: [%bar%] %message%');
         $progress->setOverwrite(false);
 
+        // Install Node modules
+        $progress->setMessage('Installing Node modules');
+        $progress->advance();
+        $process = new Process('npm install');
+        $process->setWorkingDirectory(base_path())->run();
+        $process->wait();
+
         // Check dependencies (Bulma)
         $progress->setMessage('Installing dependencies');
         $progress->start();
@@ -170,13 +177,6 @@ class InstallCommand extends Command
             '--tag'      => 'install',
             '--force'    => true,
         ]);
-
-        // Install Node modules
-        $progress->setMessage('Installing Node modules');
-        $progress->advance();
-        $process = new Process('npm install');
-        $process->setWorkingDirectory(base_path())->run();
-        $process->wait();
 
         // Fix package.json reference to cross-env
         $progress->setMessage('Fix package.json reference to cross-env');

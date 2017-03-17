@@ -51,7 +51,7 @@ class InstallCommand extends Command
             // Admin User
             $name = $this->ask('Enter a name for the admin user.');
             $email = $this->ask('Enter the admin user\'s email address');
-            $password = $this->ask('Enter the admin user\'s password');
+            $password = $this->secret('Enter the admin user\'s password');
         } else {
             $authScaffold = false;
         }
@@ -68,32 +68,32 @@ class InstallCommand extends Command
         // Install Node modules
         $progress->setMessage('Installing Node modules');
         $progress->advance();
-        $process = new Process('npm install');
-        $process->setWorkingDirectory(base_path())->run();
-        $process->wait();
+        $this->runProcess('npm install', 300);
 
         // Check dependencies (Bulma)
         $progress->setMessage('Installing dependencies');
         $progress->start();
 
-        if ($this->filesystem->exists('node_modules/bulma/') === false) {
-            $processBulma = new Process('npm install bulma --save-dev');
-            $processBulma->setWorkingDirectory(base_path())->run();
+        if ($this->checkPathExists('node_modules/bulma/') === false) {
+            $this->runProcess('npm install bulma --save-dev');
         }
 
-        if ($this->filesystem->exists('node_modules/font-awesome/') === false) {
-            $processFontAwesome = new Process('npm install font-awesome --save-dev');
-            $processFontAwesome->setWorkingDirectory(base_path())->run();
+        if ($this->checkPathExists('node_modules/font-awesome/') === false) {
+            $this->runProcess('npm install font-awesome --save-dev');
         }
 
         // Auth Scaffolding
         if ($authScaffold === true) {
+
+            // Generate auth scaffolding
+            $progress->setMessage('Generating auth scaffolding');
+            $progress->advance();
+            $this->callSilent('make:auth');
+
             if ($this->filesystem->exists('vendor/laravel/passport') === false) {
 
                 // Install Passport
-                $process = new Process('composer require laravel/passport');
-                $process->setWorkingDirectory(base_path())->run();
-                $process->wait();
+                $this->runProcess('composer require laravel/passport', 300);
 
                 // Add the service provider for passport
                 $file = config_path().'/app.php';
@@ -101,20 +101,6 @@ class InstallCommand extends Command
                 $insert = 'Laravel\Passport\PassportServiceProvider::class,';
                 $replace = $search."\n \t \t".$insert;
                 file_put_contents($file, str_replace($search, $replace, file_get_contents($file)));
-
-                $process = new Process('/usr/local/bin/composer dump-autoload');
-                $process->setWorkingDirectory(base_path())->run();
-                $process->wait();
-                $this->callSilent('clear-compiled');
-
-                // Run the passport migrations and install passport
-                $process = new Process('php artisan migrate');
-                $process->setWorkingDirectory(base_path())->run();
-                $process->wait();
-
-                $process = new Process('php artisan passport:install');
-                $process->setWorkingDirectory(base_path())->run();
-                $process->wait();
 
                 // Add HasApiTokens to the user model
                 $file = app_path().'/User.php';
@@ -152,12 +138,11 @@ class InstallCommand extends Command
                 $insert = '\Laravel\Passport\Http\Middleware\CreateFreshApiToken::class,';
                 $replace = $search."\n \t \t \t".$insert;
                 file_put_contents($file, str_replace($search, $replace, file_get_contents($file)));
-            }
 
-            // Generate auth scaffolding
-            $progress->setMessage('Generating auth scaffolding');
-            $progress->advance();
-            $this->callSilent('make:auth');
+                // Run the passport migrations and install passport
+                $this->runProcess('php artisan migrate');
+                $this->runProcess('php artisan passport:install');
+            }
 
             // Create admin user
             if (isset($name, $email, $password)) {
@@ -189,11 +174,25 @@ class InstallCommand extends Command
         // Run Laravel Mix
         $progress->setMessage('Running Laravel Mix');
         $progress->advance();
-        $process = new Process('npm run dev');
-        $process->setWorkingDirectory(base_path())->run();
-        $process->wait();
+        $this->runProcess('npm run dev');
 
         // End the progress bar
         $progress->finish();
+    }
+
+    private function checkPathExists($path)
+    {
+        return $this->filesystem->exists($path);
+    }
+
+    private function runProcess($command, $timeout = null)
+    {
+        $process = new Process($command);
+        if ($timeout != null) {
+            $process->setTimeout($timeout);
+        }
+        $process->setWorkingDirectory(base_path())->start();
+        $process->wait();
+        return $process->getExitCode();
     }
 }

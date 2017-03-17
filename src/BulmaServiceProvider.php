@@ -29,7 +29,7 @@ class BulmaServiceProvider extends ServiceProvider
         ], 'install');
 
         $this->publishes([
-            __DIR__.'/Config/bulma.php' => config_path('bulma.php'),
+            __DIR__.'/../config/bulma.php' => config_path('bulma.php'),
         ], 'config');
     }
 
